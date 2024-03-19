@@ -5,8 +5,12 @@ DocString
 from typing import List
 
 import cv2
+import matplotlib
 import torch
+from matplotlib import pyplot as plt
 from torchvision import transforms
+
+matplotlib.use("Agg")
 
 
 class DataProcessing:
@@ -160,3 +164,14 @@ def load_alignments(path: str) -> torch.Tensor:
 
 alignments = load_alignments("data/alignments/s1/bbaf2n.align")
 print(alignments)
+
+data_processing = DataProcessing()
+frames = data_processing.load_mpg_file("data/s1/bbaf2n.mpg")
+
+frame_to_display = frames[10].squeeze()
+
+print(frame_to_display)
+
+plt.imshow(frame_to_display)
+
+plt.savefig("frame.png")
