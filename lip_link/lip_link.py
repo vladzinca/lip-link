@@ -9,7 +9,8 @@ import matplotlib
 import torch
 from matplotlib import pyplot as plt
 from torchvision import transforms
-from utils.data_loading import CharConverter
+
+from lip_link.utils.char_converter import CharConverter
 
 char_converter = CharConverter()
 

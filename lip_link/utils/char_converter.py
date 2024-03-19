@@ -1,7 +1,6 @@
 """
-Load the data needed by LipLink.
+Convert between characters and their corresponding indices.
 :cls CharConverter: convert between characters and their corresponding indices
-:cls DataLoader: load the data needed by LipLink
 """
 
 from typing import List, Union
@@ -94,9 +93,3 @@ class CharConverter:
         if idx.dim() == 0:
             return self.idx_to_char[idx.item()]
         return [self.idx_to_char[index] for index in idx.tolist()]
-
-
-class DataLoader:
-    """
-    Load the data needed by LipLink.
-    """

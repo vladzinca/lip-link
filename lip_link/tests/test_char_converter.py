@@ -1,23 +1,24 @@
 """
-Test the data_loading module.
-:meth test_char_converter_get_vocabulary(): test the get_vocabulary() method of the CharConverter class
-:meth test_char_converter_get_vocabulary_size(): test the get_vocabulary_size() method of the CharConverter class
-:meth test_char_converter_convert_char_to_idx_and_convert_idx_to_char_simple(): test the convert_char_to_idx(char) and
+Test the CharConverter class.
+:meth test_get_vocabulary(): test the get_vocabulary() method of the CharConverter class
+:meth test_get_vocabulary_size(): test the get_vocabulary_size() method of the CharConverter class
+:meth test_convert_char_to_idx_and_convert_idx_to_char_simple(): test the convert_char_to_idx(char) and
       convert_idx_to_char(idx) methods of the CharConverter class with a single character or index
-:meth test_char_converter_convert_char_to_idx_and_convert_idx_to_char_list(): test the convert_char_to_idx(char) and
+:meth test_convert_char_to_idx_and_convert_idx_to_char_list(): test the convert_char_to_idx(char) and
       convert_idx_to_char(idx) methods of the CharConverter class with a list containing a single character or index
-:meth test_char_converter_convert_char_to_idx_and_convert_idx_to_char_multiple(): test the convert_char_to_idx(char) and
+:meth test_convert_char_to_idx_and_convert_idx_to_char_multiple(): test the convert_char_to_idx(char) and
       convert_idx_to_char(idx) methods of the CharConverter class with a list containing multiple characters or indices
 """
 
 import torch
 
-from ..utils import data_loading
+from ..utils.char_converter import CharConverter
 
-char_converter = data_loading.CharConverter()
+# Initialize an instance of the CharConverter class
+char_converter = CharConverter()
 
 
-def test_char_converter_get_vocabulary() -> None:
+def test_get_vocabulary() -> None:
     """
     Test the get_vocabulary() method of the CharConverter class.
     :return: None
@@ -66,7 +67,7 @@ def test_char_converter_get_vocabulary() -> None:
     ]
 
 
-def test_char_converter_get_vocabulary_size() -> None:
+def test_get_vocabulary_size() -> None:
     """
     Test the get_vocabulary_size() method of the CharConverter class.
     :return: None
@@ -74,7 +75,7 @@ def test_char_converter_get_vocabulary_size() -> None:
     assert char_converter.get_vocabulary_size() == 40
 
 
-def test_char_converter_convert_char_to_idx_and_convert_idx_to_char_simple() -> None:
+def test_convert_char_to_idx_and_convert_idx_to_char_simple() -> None:
     """
     Test the convert_char_to_idx(char) and convert_idx_to_char(idx) methods of the CharConverter class with a single
     character or index.
@@ -86,7 +87,7 @@ def test_char_converter_convert_char_to_idx_and_convert_idx_to_char_simple() -> 
     assert char_converter.convert_idx_to_char(torch.tensor(1, dtype=torch.int32)) == b"a"
 
 
-def test_char_converter_convert_char_to_idx_and_convert_idx_to_char_list() -> None:
+def test_convert_char_to_idx_and_convert_idx_to_char_list() -> None:
     """
     Test the convert_char_to_idx(char) and convert_idx_to_char(idx) methods of the CharConverter class with a list
     containing a single character or index.
@@ -98,7 +99,7 @@ def test_char_converter_convert_char_to_idx_and_convert_idx_to_char_list() -> No
     assert char_converter.convert_idx_to_char(torch.tensor([1], dtype=torch.int32)) == [b"a"]
 
 
-def test_char_converter_convert_char_to_idx_and_convert_idx_to_char_multiple() -> None:
+def test_convert_char_to_idx_and_convert_idx_to_char_multiple() -> None:
     """
     Test the convert_char_to_idx(char) and convert_idx_to_char(idx) methods of the CharConverter class with a list
     containing multiple characters or indices.
