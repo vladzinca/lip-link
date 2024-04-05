@@ -181,9 +181,10 @@ class DataLoader:
         transform_frame = transforms.Compose(
             [
                 transforms.ToPILImage(),
-                transforms.Grayscale(),
                 transforms.Lambda(lambda x: x.crop(self.DEFAULT_MOUTH_CROP)),
+                transforms.Grayscale(),
                 transforms.ToTensor(),
+                transforms.Lambda(lambda x: (x * 255).byte()),
             ]
         )
 
@@ -200,8 +201,8 @@ class DataLoader:
             frames.append(frame)
 
         # Normalize the frames to a mean equal to 0 and a standard deviation equal to 1
-        frames = torch.stack(frames, dim=0)
-        mean = torch.mean(frames)
+        frames = torch.stack(frames).to(torch.float32)
+        mean = torch.round(torch.mean(frames))
         standard_deviation = torch.std(frames)
         frames = (frames - mean) / standard_deviation
 
