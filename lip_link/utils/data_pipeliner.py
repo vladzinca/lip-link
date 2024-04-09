@@ -102,4 +102,7 @@ class DataPipeliner:
             print(count / 5, end="")
             print("%")
 
-        return batches
+        train = batches[:450]
+        test = batches[450:]
+
+        return train, test

@@ -17,9 +17,9 @@ from utils.data_pipeliner import DataPipeliner
 
 
 data_pipeliner = DataPipeliner()
-batches = data_pipeliner.pipeline_data()
+train, test = data_pipeliner.pipeline_data()
 
-batch = random.choice(batches)
+batch = random.choice(train)
 print(batch[0].shape)
 print(batch[1].shape)
 
