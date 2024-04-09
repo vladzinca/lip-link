@@ -1,9 +1,20 @@
+"""
+DocString
+"""
+
 import torch.nn as nn
 import torch.nn.functional as F
 
 
 class NeuralNetwork(nn.Module):
+    """
+    DocString
+    """
+
     def __init__(self, num_classes: int = 49):
+        """
+        DocString
+        """
         super(NeuralNetwork, self).__init__()
 
         self.conv1 = nn.Conv3d(1, 128, kernel_size=3, padding="same")
@@ -27,6 +38,9 @@ class NeuralNetwork(nn.Module):
         self.dense = nn.Linear(256, num_classes)  # 128 * 2 because of bidirectional
 
     def forward(self, x):
+        """
+        DocString
+        """
         x = F.relu(self.conv1(x))
         x = self.pool1(x)
 
