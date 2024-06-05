@@ -1,64 +1,114 @@
 """
-DocString
+Run the LipLink application.
+:cls LipLink: run the LipLink application
 """
 
-
-import random
-
-import imageio
-import numpy as np
 import torch
-from utils.char_converter import CharConverter
-from utils.data_pipeliner import DataPipeliner
-from utils.neural_network import NeuralNetwork
+from utils.data_preprocessor import DataPreprocessor
+from utils.lip_reader import LipReader
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print("Using device:", device)
 
-data_pipeliner = DataPipeliner()
-train, test = data_pipeliner.pipeline_data()
+class LipLink:
+    """
+    Run the LipLink application.
+    :meth set_device(): set the device
+    :meth test_data_preprocessor(): test the data preprocessor
+    :meth test_lip_reader(): test the lip reader
+    :meth __call__(): call the object to run the LipLink application
+    """
 
-batch = random.choice(train)
-print(batch[0].shape)
-print(batch[1].shape)
+    def set_device(self) -> None:
+        """
+        Set the device.
+        :return: None
+        """
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        print(f'From lip-link-kernel: Device set to "{self.device}".')
 
-frames_tensor = batch[0][0]
-print(batch[0][0])
-print(batch[0][0].shape)
+    def test_data_preprocessor(self) -> None:
+        """
+        Test the data preprocessor.
+        :return: None
+        """
+        # Initialize the data preprocessor
+        data_preprocessor = DataPreprocessor()
 
-frames_numpy = frames_tensor.squeeze().numpy()
-frames_numpy = ((frames_numpy + 1) * 127.5).astype(np.uint8)
+        # Preprocess the data
+        train_data_loader, _ = data_preprocessor()
 
-imageio.mimsave("./animation.gif", frames_numpy, fps=10)
+        # Get the frames and alignments from a batch of the train data loader
+        train_iter = iter(train_data_loader)
+        batch = next(train_iter)
+        frames, alignments = batch
 
-alignments_tensor = batch[1][0]
-print(
-    "".join(
-        [x.decode("utf-8") for x in data_pipeliner.data_loader.char_converter.convert_idx_to_char(alignments_tensor)]
-    )
-)
+        # Print the shape of the first video in the batch
+        print(f"Shape of video frames in the batch: {frames[0].shape}.")
 
-char_converter = CharConverter()
-model = NeuralNetwork().to(device)
+        # Print the shape of the first video's corresponding alignments
+        print(f"Shape of alignments in the batch: {alignments[0].shape}.")
 
-# Set the model to evaluation mode
-model.eval()
+        # Decode and print the text of the first alignment in the batch
+        decoded_text = "".join(
+            [x.decode("utf-8") for x in data_preprocessor.char_converter.convert_idx_to_char(alignments[0])]
+        )
+        print(f"Decoded alignments text corresponding to the first video in the batch: {decoded_text}.")
 
-inputs, _ = batch
-inputs = inputs.permute(0, 2, 1, 3, 4)
+    def test_lip_reader(self) -> None:
+        """
+        Test the lip reader neural network model by running a batch through it and decoding the output.
+        """
+        # Initialize the data preprocessor
+        data_preprocessor = DataPreprocessor()
 
-# Send inputs to the same device as the model
-inputs = inputs.to(device)
+        # Preprocess the data
+        train_data_loader, _ = data_preprocessor()
 
-# Do not compute gradient since we're only predicting
-with torch.no_grad():
-    outputs = model(inputs)
+        # Get the frames and alignments from a batch of the train data loader
+        train_iter = iter(train_data_loader)
+        batch = next(train_iter)
+        frames, alignments = batch
 
-# Convert the model predictions (outputs) to class indices
-predicted_indices = torch.argmax(outputs, dim=2)
+        # Initialize the LipReader model and set it to evaluation mode
+        lip_reader = LipReader().to(self.device)
+        lip_reader.eval()
 
-print(
-    "".join(
-        [x.decode("utf-8") for x in data_pipeliner.data_loader.char_converter.convert_idx_to_char(predicted_indices[1])]
-    )
-)
+        # Move the batch to the same device as the model
+        frames = frames.to(self.device)
+
+        # Run the batch through the LipReader model
+        with torch.no_grad():
+            outputs = lip_reader(frames)
+
+        # Decode the outputs
+        _, predicted_indices = torch.max(outputs, dim=2)
+        print(predicted_indices)
+        predicted_texts = [
+            "".join([x.decode("utf-8") for x in data_preprocessor.char_converter.convert_idx_to_char(idx)])
+            for idx in predicted_indices
+        ]
+
+        # Decode the alignments
+        decoded_alignments = [
+            "".join([x.decode("utf-8") for x in data_preprocessor.char_converter.convert_idx_to_char(alignment)])
+            for alignment in alignments
+        ]
+
+        # Print the decoded texts
+        for predicted_text, decoded_alignment in zip(predicted_texts, decoded_alignments):
+            print(f"Decoded predicted text from LipReader: {predicted_text}.")
+            print(f"Decoded actual text corresponding to the video: {decoded_alignment}.")
+
+    def __call__(self) -> None:
+        """
+        Call the object to run the LipLink application.
+        :return: None
+        """
+        self.set_device()
+        self.test_lip_reader()
+
+
+# Check if the script is run as the main program
+if __name__ == "__main__":
+    # Initialize an instance of the LipLink class and run the application
+    lip_link = LipLink()
+    lip_link()
