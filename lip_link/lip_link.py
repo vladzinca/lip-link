@@ -11,11 +11,18 @@ from utils.lip_reader import LipReader
 class LipLink:
     """
     Run the LipLink application.
+    :meth __init__(): initialize an instance of the LipLink class
     :meth set_device(): set the device
     :meth test_data_preprocessor(): test the data preprocessor
     :meth test_lip_reader(): test the lip reader
     :meth __call__(): call the object to run the LipLink application
     """
+
+    def __init__(self) -> None:
+        """
+        Initialize an instance of the LipLink class.
+        """
+        self.set_device()
 
     def set_device(self) -> None:
         """
@@ -81,7 +88,6 @@ class LipLink:
 
         # Decode the outputs
         _, predicted_indices = torch.max(outputs, dim=2)
-        print(predicted_indices)
         predicted_texts = [
             "".join([x.decode("utf-8") for x in data_preprocessor.char_converter.convert_idx_to_char(idx)])
             for idx in predicted_indices
@@ -103,7 +109,6 @@ class LipLink:
         Call the object to run the LipLink application.
         :return: None
         """
-        self.set_device()
         self.test_lip_reader()
 
 

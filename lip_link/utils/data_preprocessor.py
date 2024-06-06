@@ -10,9 +10,10 @@ from typing import Tuple
 
 import cv2
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 from torchvision import transforms
 from utils.char_converter import CharConverter
+from utils.lip_reader_dataset import LipReaderDataset
 
 
 class DataPreprocessor:
@@ -168,28 +169,6 @@ class DataPreprocessor:
 
         return frames, alignments
 
-    class LipLinkDataset(Dataset):
-        def __init__(self, data):
-            """
-            Initialize the dataset with preprocessed data.
-            :param data: List of tuples, where each tuple contains frames and alignments.
-            """
-            self.data = data
-
-        def __len__(self):
-            """
-            Return the number of items in the dataset.
-            """
-            return len(self.data)
-
-        def __getitem__(self, index):
-            """
-            Return a single item from the dataset.
-            :param index: Index of the item to return.
-            """
-            frames, alignments = self.data[index]
-            return frames, alignments
-
     def preprocess_data(self) -> Tuple[DataLoader, DataLoader]:
         """
         Preprocess data to obtain the training and testing data loaders needed to train and test a PyTorch-based model.
@@ -200,9 +179,9 @@ class DataPreprocessor:
         pipelined_data_count = 0
 
         # Iterate over the MPG file paths
-        for i in range(len(self.mpg_file_paths)):
+        for mpg_file_path in self.mpg_file_paths:
             # Load and pad data for a video and its corresponding align file
-            frames, alignments = self.pad_data(self.mpg_file_paths[i])
+            frames, alignments = self.pad_data(mpg_file_path)
 
             # Permute the frames to have the frame dimension last
             frames = frames.permute(0, 2, 3, 1)
@@ -226,8 +205,8 @@ class DataPreprocessor:
         test_data = pipelined_data[train_data_count:]
 
         # Add the data to the training and testing sets
-        train_dataset = self.LipLinkDataset(train_data)
-        test_dataset = self.LipLinkDataset(test_data)
+        train_dataset = LipReaderDataset(train_data)
+        test_dataset = LipReaderDataset(test_data)
 
         # Create the training and testing data loaders
         train_data_loader = DataLoader(train_dataset, batch_size=2, shuffle=True)

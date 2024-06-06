@@ -21,7 +21,7 @@ class LipReader(nn.Module):
     :attr dropout: nn.Dropout representing the dropout layer
     :attr fully_connected: nn.Linear representing the fully-connected layer
     :meth __init__(vocabulary_size): initialize an instance of the LipReader class
-    :meth forward(x): implement the forward pass of the LipReader model
+    :meth forward(input_data): implement the forward pass of the LipReader model
     """
 
     def __init__(self, vocabulary_size: int = CharConverter().get_vocabulary_size()) -> None:
@@ -31,7 +31,7 @@ class LipReader(nn.Module):
         :return: None
         """
         # Call the constructor of the parent class
-        super(LipReader, self).__init__()
+        super().__init__()
 
         # Store the layers of the LipReader model
         self.conv3d_1 = nn.Conv3d(in_channels=1, out_channels=128, kernel_size=3, padding="same")
@@ -47,31 +47,31 @@ class LipReader(nn.Module):
 
         self.fully_connected = nn.Linear(in_features=256, out_features=vocabulary_size)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, input_data: torch.Tensor) -> torch.Tensor:
         """
         Implement the forward pass of the LipReader model.
-        :param x: torch.Tensor representing the input data
+        :param input_data: torch.Tensor representing the input data
         :return: torch.Tensor representing the output of the LipReader model
         """
         # Convolutional layers
-        x = F.relu(self.conv3d_1(x))
-        x = self.maxpool3d(x)
-        x = F.relu(self.conv3d_2(x))
-        x = self.maxpool3d(x)
-        x = F.relu(self.conv3d_3(x))
-        x = self.maxpool3d(x)
+        input_data = F.relu(self.conv3d_1(input_data))
+        input_data = self.maxpool3d(input_data)
+        input_data = F.relu(self.conv3d_2(input_data))
+        input_data = self.maxpool3d(input_data)
+        input_data = F.relu(self.conv3d_3(input_data))
+        input_data = self.maxpool3d(input_data)
 
         # Prepare for LSTM layers
-        x = x.permute(0, 4, 2, 3, 1)
-        x = x.reshape(x.size(0), x.size(1), -1)
+        input_data = input_data.permute(0, 4, 2, 3, 1)
+        input_data = input_data.reshape(input_data.size(0), input_data.size(1), -1)
 
         # LSTM layers
-        x, _ = self.lstm_1(x)
-        x = self.dropout(x)
-        x, _ = self.lstm_2(x)
-        x = self.dropout(x)
+        input_data, _ = self.lstm_1(input_data)
+        input_data = self.dropout(input_data)
+        input_data, _ = self.lstm_2(input_data)
+        input_data = self.dropout(input_data)
 
         # Fully-connected layer
-        x = self.fully_connected(x)
+        input_data = self.fully_connected(input_data)
 
-        return x
+        return input_data
