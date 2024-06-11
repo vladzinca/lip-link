@@ -162,8 +162,8 @@ class DataPreprocessor:
         if frames_to_pad > 0:
             frames = torch.nn.functional.pad(frames, (0, 0, 0, 0, 0, 0, frames_to_pad, 0), "constant", 0)
 
-        # Pad the alignments if necessary to ensure they have 48 characters
-        chars_to_pad = 48 - alignments.size(0)
+        # Pad the alignments if necessary to ensure they have 40 characters
+        chars_to_pad = 40 - alignments.size(0)
         if chars_to_pad > 0:
             alignments = torch.nn.functional.pad(alignments, (0, chars_to_pad), "constant", 0)
 
@@ -194,7 +194,7 @@ class DataPreprocessor:
             pipelined_data_count += 1
             pipelined_data_percentage = pipelined_data_count * 100 / len(self.mpg_file_paths)
 
-            if pipelined_data_percentage % 5 == 0:
+            if pipelined_data_percentage % 25 == 0:
                 print(f"From lip-link-kernel: Pipelining data at {int(pipelined_data_percentage)}%.", file=sys.stderr)
 
         # Calculate how many data points are in the training set
