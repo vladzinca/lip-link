@@ -8,6 +8,7 @@ from typing import Tuple
 
 import cv2
 import torch
+
 from utils.char_converter import CharConverter
 
 
@@ -15,7 +16,7 @@ class DataPreprocessor:
     """
     Preprocess the data needed by LipLink.
     :attr char_converter: CharConverter representing the object used to convert between characters and indices
-    :meth __init__(mouth_crop, char_converter): initialize an instance of the DataPreprocessor class
+    :meth __init__(char_converter): initialize an instance of the DataPreprocessor class
     :meth load_mpg_file(mpg_file_path): load the data from an MPG file
     :meth load_align_file(align_file_path): load the data from an align file
     :meth load_data(mpg_file_path): load the data from an MPG file and an align file

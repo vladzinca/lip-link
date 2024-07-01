@@ -5,12 +5,14 @@ Train the lip reader model.
 
 import csv
 import os
+import sys
 import time
 from typing import Tuple
 
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
+
 from utils.char_converter import CharConverter
 from utils.lip_reader import LipReader
 
@@ -23,33 +25,33 @@ class LipReaderTrainer:
     :const DEFAULT_EPOCHS: int representing the default number of epochs
     :const DEFAULT_EXAMPLES_COUNT: int representing the default number of examples to produce at the end of each epoch
     :attr train_data_loader: DataLoader representing the training data loader
-    :attr test_data_loader: DataLoader representing the testing data loader
+    :attr validation_data_loader: DataLoader representing the validation data loader
     :attr model: nn.Module representing the lip reader model
     :attr learning_rate: int representing the learning rate
     :attr checkpoint_dir_path: str representing the path where to save checkpoints
     :attr epochs: int representing the number of epochs
     :attr char_converter: CharConverter representing the object used to convert between characters and indices
-    :attr device: torch.device representing the device
+    :attr device: torch.device representing the device used for training
     :attr criterion: CTCLoss representing the loss function
     :attr optimizer: torch.optim.Adam representing the optimizer
-    :meth __init__(train_data_loader, test_data_loader, model, learning_rate, checkpoint_dir_path, epochs,
+    :meth __init__(train_data_loader, validation_data_loader, model, learning_rate, checkpoint_dir_path, epochs,
                    char_converter): initialize an instance of the LipReaderTrainer class
     :meth set_device(): set the device
     :meth set_hyperparameters(): set the hyperparameters
     :meth convert_seconds(seconds): convert the time from seconds to hours, minutes, and seconds
     :meth scheduler(optimizer, epoch, initial_learning_rate, decay_rate): define and set the learning rate
-    :meth save_checkpoint(epoch, checkpoint_file_name): save the current model checkpoint
+    :meth save_checkpoint(checkpoint_file_name): save the current model checkpoint
     :meth __call__(): train the lip reader model
     """
 
     DEFAULT_LEARNING_RATE = 0.0001
     DEFAULT_CHECKPOINT_DIR_PATH = "./checkpoints/experiment_4"
-    DEFAULT_EPOCHS = 150
+    DEFAULT_EPOCHS = 100
 
     def __init__(
         self,
         train_data_loader: DataLoader,
-        test_data_loader: DataLoader,
+        validation_data_loader: DataLoader,
         model: nn.Module = LipReader(),
         learning_rate: int = DEFAULT_LEARNING_RATE,
         checkpoint_dir_path: str = DEFAULT_CHECKPOINT_DIR_PATH,
@@ -59,7 +61,7 @@ class LipReaderTrainer:
         """
         Initialize an instance of the LipReaderTrainer class.
         :param train_data_loader: DataLoader representing the training data loader
-        :param test_data_loader: DataLoader representing the testing data loader
+        :param validation_data_loader: DataLoader representing the validation data loader
         :param model: nn.Module representing the lip reader model
         :param learning_rate: int representing the learning rate
         :param checkpoint_dir_path: str representing the path where to save checkpoints
@@ -69,7 +71,7 @@ class LipReaderTrainer:
         """
         # Store the lip reader trainer attributes
         self.train_data_loader = train_data_loader
-        self.test_data_loader = test_data_loader
+        self.validation_data_loader = validation_data_loader
         self.model = model
 
         self.learning_rate = learning_rate
@@ -89,7 +91,7 @@ class LipReaderTrainer:
         """
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = self.model.to(self.device)
-        print(f'From lip-link-kernel: Device set to "{self.device}".')
+        print(f'From lip-link-kernel: Device set to "{self.device}".', file=sys.stderr)
 
     def set_hyperparameters(self) -> None:
         """
@@ -134,10 +136,9 @@ class LipReaderTrainer:
                 param_group["lr"] = learning_rate
             return learning_rate
 
-    def save_checkpoint(self, epoch: int, checkpoint_file_name: str = "checkpoint.pth") -> None:
+    def save_checkpoint(self, checkpoint_file_name: str = "checkpoint.pth") -> None:
         """
         Save the current model checkpoint.
-        :param epoch: int representing the epoch
         :param checkpoint_file_name: str representing the checkpoint file name
         :return: None
         """
@@ -155,7 +156,6 @@ class LipReaderTrainer:
         # Initialize lists to store losses and learning rates
         train_loss_list = []
         val_loss_list = []
-        lr_list = []
 
         for epoch in range(self.epochs):
             # Store starting time
@@ -200,10 +200,10 @@ class LipReaderTrainer:
             # Set the model to evaluation mode
             self.model.eval()
 
-            # Iterate over the testing data loader
+            # Iterate over the validation data loader
             total_val_loss = 0.0
             with torch.no_grad():
-                for frames, alignments in self.test_data_loader:
+                for frames, alignments in self.validation_data_loader:
                     # Add a channel dimension at position 1
                     frames = frames.unsqueeze(1)
 
@@ -233,19 +233,18 @@ class LipReaderTrainer:
 
             # Calculate the average training and validation losses
             average_train_loss = total_train_loss / len(self.train_data_loader)
-            average_val_loss = total_val_loss / len(self.test_data_loader)
+            average_val_loss = total_val_loss / len(self.validation_data_loader)
 
             # Print the epoch, training loss, and validation loss
             current_lr = self.optimizer.param_groups[0]["lr"]
             print(
                 f"Epoch took {elapsed_hours:02d}:{elapsed_minutes:02d}:{elapsed_seconds:02d}, ",
-                f"train_loss: {average_train_loss:.4f} - val_loss: {average_val_loss:.4f} - lr: {current_lr}",
+                f"train_loss: {average_train_loss:.4f} - val_loss: {average_val_loss:.4f} - lr: {current_lr}.",
             )
 
             # Append the losses and learning rate to the lists
-            train_loss_list.append(average_train_loss)
-            val_loss_list.append(average_val_loss)
-            lr_list.append(current_lr)
+            train_loss_list.append(round(average_train_loss, 2))
+            val_loss_list.append(round(average_val_loss, 2))
 
             # Save a checkpoint
             self.save_checkpoint(epoch, f"checkpoint_epoch_{epoch + 1}.pth")
@@ -253,13 +252,12 @@ class LipReaderTrainer:
             # Print an example
             target = "".join([x.decode("utf-8") for x in self.char_converter.convert_idx_to_char(alignments[0])])
             pred = "".join([x.decode("utf-8") for x in self.char_converter.convert_idx_to_char(decoded_outputs[0])])
-            print(f"Target: {target}")
-            print(f"Prediction: {pred}")
+            print(f'Target: "{target}".')
+            print(f'Prediction: {pred}".')
             print("=" * 64)
 
-        # Save the results to a CSV file
-        with open("results.csv", mode="a", newline="") as file:
+        # Save the losses to a CSV file
+        with open("loss.csv", mode="a", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow([self.checkpoint_dir_path, "train_loss"] + train_loss_list)
             writer.writerow([self.checkpoint_dir_path, "val_loss"] + val_loss_list)
-            writer.writerow([self.checkpoint_dir_path, "lr"] + lr_list)
