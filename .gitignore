@@ -2,7 +2,6 @@
 .venv/
 .vscode/
 *.egg-info/
-checkpoints/
 data/
 __init__.py
 __pycache__/

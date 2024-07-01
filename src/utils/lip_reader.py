@@ -3,8 +3,9 @@ Implement the neural network model for lip reading.
 :cls LipReader: implement the neural network model for lip reading
 """
 
-import torch.nn as nn
+import torch
 import torch.nn.functional as F
+from torch import nn
 
 
 class LipReader(nn.Module):
@@ -25,7 +26,7 @@ class LipReader(nn.Module):
     :meth forward(x): implement the forward pass of the LipReader model
     """
 
-    def __init__(self, num_classes: int = 40):
+    def __init__(self, num_classes: int = 40) -> None:
         """
         Initialize an instance of the LipReader class.
         :param num_classes: int representing the size of the vocabulary
@@ -49,7 +50,7 @@ class LipReader(nn.Module):
 
         self.fc = nn.Linear(256, num_classes)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Implement the forward pass of the LipReader model.
         :param x: torch.Tensor representing the tensor to pass through the LipReader model

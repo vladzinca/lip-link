@@ -7,6 +7,7 @@ import os
 from typing import Tuple
 
 import cv2
+import numpy as np
 import torch
 
 from utils.char_converter import CharConverter
@@ -58,7 +59,7 @@ class DataPreprocessor:
             frames.append(frame)
 
         # Normalize the frames to a mean equal to 0 and a standard deviation equal to 1
-        frames = torch.tensor(frames, dtype=torch.float32)
+        frames = torch.tensor(np.array(frames), dtype=torch.float32)
         mean = frames.mean()
         standard_deviation = frames.std()
         frames = (frames - mean) / standard_deviation

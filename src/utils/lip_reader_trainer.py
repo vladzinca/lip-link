@@ -130,11 +130,11 @@ class LipReaderTrainer:
         """
         if epoch < 30:
             return initial_learning_rate
-        else:
-            learning_rate = initial_learning_rate * torch.exp(torch.tensor(-decay_rate))
-            for param_group in optimizer.param_groups:
-                param_group["lr"] = learning_rate
-            return learning_rate
+
+        learning_rate = initial_learning_rate * torch.exp(torch.tensor(-decay_rate))
+        for param_group in optimizer.param_groups:
+            param_group["lr"] = learning_rate
+        return learning_rate
 
     def save_checkpoint(self, checkpoint_file_name: str = "checkpoint.pth") -> None:
         """
@@ -247,13 +247,13 @@ class LipReaderTrainer:
             val_loss_list.append(round(average_val_loss, 2))
 
             # Save a checkpoint
-            self.save_checkpoint(epoch, f"checkpoint_epoch_{epoch + 1}.pth")
+            self.save_checkpoint(f"checkpoint_epoch_{epoch + 1}.pth")
 
             # Print an example
             target = "".join([x.decode("utf-8") for x in self.char_converter.convert_idx_to_char(alignments[0])])
             pred = "".join([x.decode("utf-8") for x in self.char_converter.convert_idx_to_char(decoded_outputs[0])])
             print(f'Target: "{target}".')
-            print(f'Prediction: {pred}".')
+            print(f'Prediction: "{pred}".')
             print("=" * 64)
 
         # Save the losses to a CSV file
