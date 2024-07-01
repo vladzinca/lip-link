@@ -3,6 +3,9 @@ Back log for Lip Link
 
 To-do legend: [*] improved; [+] feature; [-] fixed; [!] notes;
 
+   - [*] Rename lip_link/ folder to src/.
+   - [*] Use Andrew Ng's training / cross-validation / testing split of (60, 20, 20).
+   - [+] Use ML Flow for graphs.
    - [+] Create lip-link-kernel class for messages.
    - [*] Remove one frame from 75 instead of padding 74 frames to 75. Make sure you are not adding the blank frame in the beginning instead of the end.
    - [*] Check that the training uses the GPU.
@@ -17,3 +20,4 @@ To-do legend: [*] improved; [+] feature; [-] fixed; [!] notes;
    - [+] Create unit tests.
    - [*] Add a pip list or pip freeze in the README file.
    - [*] Remove pre-commit from requirements after you are done.
+   - [!] Set the Power & battery of your Windows machine to default.
