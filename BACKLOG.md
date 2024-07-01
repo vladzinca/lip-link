@@ -3,6 +3,7 @@ Back log for Lip Link
 
 To-do legend: [*] improved; [+] feature; [-] fixed; [!] notes;
 
+   - [*] Rename lip_link/ folder to src/.
    - [*] Use Andrew Ng's training / cross-validation / testing split of (60, 20, 20).
    - [+] Use ML Flow for graphs.
    - [+] Create lip-link-kernel class for messages.
