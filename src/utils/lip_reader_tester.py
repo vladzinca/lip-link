@@ -222,6 +222,6 @@ class LipReaderTester:
         print(f"Word error rate, total: {word_error_rate}%.")
         print(f"Word error rate, per sentence: {average_word_error_rate}.")
         print(f"Levenshtein distance, total: {general_levenshtein_distance}%.")
-        print(f"Levenhstein distance, characters per sentence: {average_levenshtein_distance}.")
+        print(f"Levenshtein distance, characters per sentence: {average_levenshtein_distance}.")
         print(f"Accuracy, total: {accuracy}%.")
         print("=" * 64)
