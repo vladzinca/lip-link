@@ -31,8 +31,6 @@ class DemoGUI:
         :param root: tk.Tk representing the root window of the application
         :return: None
         """
-
-        print(type(root))
         self.root = root
         self.root.title("LipLink Demo v1.1")
 
