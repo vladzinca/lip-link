@@ -10,6 +10,8 @@ The goal of this project is to set the basis of a more complex system which, in 
 
 ## How to use
 
+### Create virtual environment
+
 The recommended way to run the program is through a Python virtual environment.
 
 I am using Python 3.8.10, but any newer version will do fine.
@@ -95,7 +97,9 @@ urllib3==2.2.2
 virtualenv==20.26.3
 ```
 
-5.  Afterwards, one can run the different program functionalities using the following command:
+### Run the LipLink application
+
+Afterwards, one can run the different program functionalities using the following command:
 ```bash
 (.venv) vlad_@kalpapadapa:$ python src/main.py [--fetch / --train / --test]
 ```
@@ -149,3 +153,23 @@ From lip-link-kernel: Whole process took 00:00:27.
 ```
 
 As we can observe, the accuracy is computed to be `88.04%`, as already discussed.
+
+### Run the demo
+
+To run the demo application in the CLI, one can use:
+```bash
+(.venv) vlad_@kalpapadapa:$ python src/demo.py <video_path>
+```
+
+For it to work, videos need to be 75 frames long and exactly 360 x 288 pixels.
+
+### Run the GUI demo
+
+To run the GUI demo, one can use:
+```bash
+(.venv) vlad_@kalpapadapa:$ python src/demo-gui.py
+```
+
+This will open the demo GUI and let the user load videos to be passed through the model for a prediction. For it to work, the same video conditions apply.
+
+Note that WSL might not work properly as the application needs to connect to the computer's display.

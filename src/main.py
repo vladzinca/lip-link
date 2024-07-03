@@ -21,9 +21,8 @@ class LipLink:
     Run the LipLink application.
     :meth convert_seconds(seconds): convert the time from seconds to hours, minutes, and seconds
     :meth fetch(): fetch the data needed by LipLink
-    :meth test_lip_reader_data_loader(): test the data preprocessor
-    :meth test_lip_reader(): test the lip reader
-    :meth test_lip_reader_trainer(): test the lip reader trainer
+    :meth train(train_data_loader, validation_data_loader): train the LipLink model
+    :meth test(test_data_loader): test the LipLink model
     :meth __call__(): call the object to run the LipLink application
     """
 
@@ -67,11 +66,11 @@ class LipLink:
             file=sys.stderr,
         )
 
-    def train(self, train_data_loader: DataLoader, test_data_loader: DataLoader) -> None:
+    def train(self, train_data_loader: DataLoader, validation_data_loader: DataLoader) -> None:
         """
         Train the LipLink model.
         :param train_data_loader: DataLoader representing the training data loader
-        :param test_data_loader: DataLoader representing the testing data loader
+        :param validation_data_loader: DataLoader representing the validation data loader
         :return: None
         """
         # Store starting time
@@ -79,7 +78,7 @@ class LipLink:
         print(f'From lip-link-kernel: Process started at "{datetime.fromtimestamp(starting_time)}".', file=sys.stderr)
 
         # Initialize the lip reader trainer
-        lip_reader_trainer = LipReaderTrainer(train_data_loader, test_data_loader)
+        lip_reader_trainer = LipReaderTrainer(train_data_loader, validation_data_loader)
 
         # Train the model
         lip_reader_trainer()

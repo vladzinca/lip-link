@@ -93,12 +93,12 @@ class LipReaderTester:
             self.model.load_state_dict(
                 torch.load("./checkpoints/experiment_2/checkpoint_epoch_100.pth", map_location=torch.device("cuda"))
             )
-            print("From lip-link-kernel: The testing will use the GPU.", file=sys.stderr)
+            print("From lip-link-kernel: Model loaded on the GPU.", file=sys.stderr)
         else:
             self.model.load_state_dict(
                 torch.load("./checkpoints/experiment_2/checkpoint_epoch_100.pth", map_location=torch.device("cpu"))
             )
-            print("From lip-link-kernel: The testing will use the CPU.", file=sys.stderr)
+            print("From lip-link-kernel: Model loaded on the CPU.", file=sys.stderr)
 
     @staticmethod
     def compute_word_error(target: str, pred: str) -> int:
